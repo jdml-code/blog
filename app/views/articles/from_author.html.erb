@@ -1,0 +1,8 @@
+<div class="large-container center-block">
+  <% if user_signed_in? %>
+    <h1>Articles by <%= @user.email %></h1>
+    <%= render @user.articles %>
+  <% else %>
+    <p>Remember Log in</p>
+  <%end%>
+</div>

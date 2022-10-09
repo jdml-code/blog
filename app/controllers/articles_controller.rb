@@ -1,34 +1,33 @@
 class ArticlesController < ApplicationController
+  before_action :find_article, except: [:index, :new, :create, :article_params, :from_author]
   before_action :authenticate_user!, only: [:new, :create, :edit, :update, :destroy]
   def index
     @articles = Article.all
   end
 
-  def show
-    @article = Article.find(params[:id])
-  end
+  def show; end
 
   def new
     @article = Article.new
   end
 
   def create
-    @article = Article.new(article_params)
+    @article = current_user.articles.create(title: params[:article][:title],
+                                            body: params[:article][:body],
+                                            status: params[:article][:status])
+    redirect_to @article
+    #Article.new(article_params)
 
-    if @article.save
-      redirect_to @article
-    else
-      render :new, status: :unprocessable_entity
-    end
+  #   if @article.save
+  #     redirect_to @article
+  #   else
+  #     render :new, status: :unprocessable_entity
+  #   end
   end
 
-  def edit
-    @article = Article.find(params[:id])
-  end
+  def edit; end
 
   def update
-    @article = Article.find(params[:id])
-
     if @article.update(article_params)
       redirect_to @article
     else
@@ -37,9 +36,7 @@ class ArticlesController < ApplicationController
   end
 
   def destroy
-    @article = Article.find(params[:id])
     @article.destroy
-
     redirect_to root_path, status: :see_other
   end
 
@@ -47,5 +44,13 @@ class ArticlesController < ApplicationController
 
   def article_params
     params.require(:article).permit(:title, :body, :status)
+  end
+
+  def from_author
+    @user = User.find(params[:user_id])
+  end
+
+  def find_article
+    @article = Article.find(params[:id])
   end
 end
